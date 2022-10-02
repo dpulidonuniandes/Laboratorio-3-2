@@ -20,7 +20,7 @@ def multiples():
 
 NUM_HILOS = 4
 
-for num_hilo in range(NUM_HILOS):
+for hilo in range(NUM_HILOS):
     hilo = threading.Thread(name='hilo%s' %num_hilo, 
                             target=multiples)    
     hilo.start()
