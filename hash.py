@@ -1,18 +1,22 @@
-
+import struct
 import hashlib
- 
-def hash_file():
-    filename = None
-    tipo = 1 #int(input("Escriba el numero del archivo que usara \n 1- 100MB \n 2- 250MB \n"))
-    if (tipo==1):
-        filename = "archivo1.txt"
-    else:
-        filename = "archivo2.txt"
-
+import os 
+def hash_file(filename):
+    
     md5_hash = hashlib.md5()
     with open(filename,"rb") as f:
         for byte_block in iter(lambda: f.read(4096),b""):
             md5_hash.update(byte_block)
 
     return md5_hash.hexdigest()
+
+def enviar(sock,filename):
+    filesize = os.path.getsize(filename)
+
+    sock.request.send((struct.pack("<Q", filesize)).encode())
+    """with open(filename, "rb") as f:
+        while read_bytes := f.read(4096):
+            sock.request.sendall(read_bytes)"""
+    print("Enviado.")
+    return
 

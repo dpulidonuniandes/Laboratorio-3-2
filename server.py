@@ -2,13 +2,14 @@ import threading
 import socketserver, socket
 import sys
 import os
+import struct
 import logging, logging.handlers
 import hash
 TIMEOUT = 500
 HOST = '127.0.0.1'
 PORT = 10000
 
-MAX_THREADS = 40
+MAX_THREADS = 2
 
 LOG_FOLDER = './Laboratorio-3'
 LOG_FILE = 'socket-server.log'
@@ -39,16 +40,27 @@ except Exception as error:
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
+    
+
+
+
+
     def handle(self):
-        mensaje = str(hash.hash_file())
+        filename=None
+        tipo = 1 #int(input("Escriba el numero del archivo que usara \n 1- 100MB \n 2- 250MB \n"))
+        if (tipo==1):
+            filename = "archivo1.txt"
+        else:
+            filename = "archivo2.txt"
+
+        #mensaje = str(hash.hash_file(filename))
         while True:
             try:
                 # chequeamos el numero de threads activos. Si es mayor que el limite establecido cerramos la conexion y no atendemos al cliente. Lo trazamos
                 if threading.activeCount() > MAX_THREADS:
                     #logger.warn('Max threads number as been reached.')
-                    enviar(self)
-                    self.request.send(mensaje.encode())
-                    print("Envio")
+                    
+                    hash.enviar(self, filename)
                 # si no hemos alcanzado el limite lo atendemos
                 else:
                     activeThreads = threading.activeCount() - 1
@@ -58,18 +70,16 @@ class RequestHandler(socketserver.BaseRequestHandler):
                     logger.info('[%s] -- %s -- Received: %s' , clientIP, data)
                     response = 'Thanks %s, message received!!' % clientIP
                     self.request.send(response)
-            except (Exception,error):
+            except Exception as error:
                 if str(error) == "timed out":
                     logger.error ('[%s] -- %s -- Timeout on data transmission ocurred after %d seconds.' , clientIP, TIMEOUT)
 
-    def enviar(self):
-        with open(filename, "rb") as f:
-            while read_bytes := f.read(4096):
-                self.request.sendall(read_bytes)
-        print("Enviado.")
+
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+
+        
     def server_bind(self):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(self.server_address)
