@@ -3,12 +3,12 @@ import socketserver, socket
 import sys
 import os
 import logging, logging.handlers
+import hash
+TIMEOUT = 500
+HOST = '127.0.0.1'
+PORT = 10000
 
-TIMEOUT = 10
-HOST = '192.168.117.1'
-PORT = 3456
-
-MAX_THREADS = 50
+MAX_THREADS = 40
 
 LOG_FOLDER = './Laboratorio-3'
 LOG_FILE = 'socket-server.log'
@@ -40,26 +40,34 @@ except Exception as error:
 
 class RequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        try:
-            # chequeamos el numero de threads activos. Si es mayor que el limite establecido cerramos la conexion y no atendemos al cliente. Lo trazamos
-            if threading.activeCount() > MAX_THREADS:
-                logger.warn('%s -- Execution threads number: %d', threading.currentThread().getName(),
-                            threading.activeCount() - 1)
-                logger.warn('Max threads number as been reached.')
-                self.closed()
-            # si no hemos alcanzado el limite lo atendemos
-            else:
-                threadName = threading.currentThread().getName()
-                activeThreads = threading.activeCount() - 1
-                clientIP = self.client_address[0]
-                logger.info('[%s] -- New connection from %s -- Active threads: %d' , threadName, clientIP, activeThreads)
-                data = self.request.recv(1024)
-                logger.info('[%s] -- %s -- Received: %s' , threadName, clientIP, data)
-                response = 'Thanks %s, message received!!' % clientIP
-                self.request.send(response)
-        except (Exception,error):
-            if str(error) == "timed out":
-                logger.error ('[%s] -- %s -- Timeout on data transmission ocurred after %d seconds.' ,threadName, clientIP, TIMEOUT)
+        mensaje = str(hash.hash_file())
+        while True:
+            try:
+                # chequeamos el numero de threads activos. Si es mayor que el limite establecido cerramos la conexion y no atendemos al cliente. Lo trazamos
+                if threading.activeCount() > MAX_THREADS:
+                    #logger.warn('Max threads number as been reached.')
+                    enviar(self)
+                    self.request.send(mensaje.encode())
+                    print("Envio")
+                # si no hemos alcanzado el limite lo atendemos
+                else:
+                    activeThreads = threading.activeCount() - 1
+                    clientIP = self.client_address[0]
+                    logger.info('[%s] -- New connection from %s -- Active threads: %d' , clientIP, activeThreads)
+                    data = self.request.recv(1024)
+                    logger.info('[%s] -- %s -- Received: %s' , clientIP, data)
+                    response = 'Thanks %s, message received!!' % clientIP
+                    self.request.send(response)
+            except (Exception,error):
+                if str(error) == "timed out":
+                    logger.error ('[%s] -- %s -- Timeout on data transmission ocurred after %d seconds.' , clientIP, TIMEOUT)
+
+    def enviar(self):
+        with open(filename, "rb") as f:
+            while read_bytes := f.read(4096):
+                self.request.sendall(read_bytes)
+        print("Enviado.")
+
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     def server_bind(self):
@@ -68,8 +76,8 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
     def finish_request(self, request, client_address):
         request.settimeout(TIMEOUT)
-        SocketServer.TCPServer.finish_request(self, request, client_address)
-        SocketServer.TCPServer.close_request(self, request)
+        socketserver.TCPServer.finish_request(self, request, client_address)
+        socketserver.TCPServer.close_request(self, request)
 
 try:
     print ("Starting server TCP at IP %s and port %d..." % (HOST,PORT))

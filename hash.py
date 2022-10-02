@@ -3,7 +3,7 @@ import hashlib
  
 def hash_file():
     filename = None
-    tipo =int(input("Escriba el numero del archivo que usara \n 1- 100MB \n 2- 250MB \n"))
+    tipo = 1 #int(input("Escriba el numero del archivo que usara \n 1- 100MB \n 2- 250MB \n"))
     if (tipo==1):
         filename = "archivo1.txt"
     else:
@@ -13,6 +13,6 @@ def hash_file():
     with open(filename,"rb") as f:
         for byte_block in iter(lambda: f.read(4096),b""):
             md5_hash.update(byte_block)
-    print(md5_hash.hexdigest())
-    return
+
+    return md5_hash.hexdigest()
 
