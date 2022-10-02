@@ -1,6 +1,7 @@
 import socket
 import os
 from _thread import *
+import tqdm
 
 IP = '192.168.1.109'
 PORT = 4455
@@ -31,14 +32,35 @@ def multi_threaded_client(conn,cliente):
     filename= archivo #CAMBIAR POR UN INPUT
     file = open(filename, "r")
     data = file.read()
+    """ Reciving the sizefile to the server. """
+    tamano=conn.recv(SIZE).decode(FORMAT)
+    
     """ Sending the filename to the server. """
     conn.send(filename.encode(FORMAT))
     msg = conn.recv(SIZE).decode(FORMAT)
+
     print(f"[SERVER]: {msg}")
     """ Sending the file data to the server. """
-    conn.send(data.encode(FORMAT))
+    """ conn.send(data.encode(FORMAT))
     msg = conn.recv(SIZE).decode(FORMAT)
-    print(f"[SERVER]: {msg}")
+    print(f"[SERVER]: {msg}")""" 
+    filesize = 104857600 #CAmbiar despues
+    progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+    with open(filename, "rb") as f:
+        print()
+        while True:
+            # read the bytes from the file
+            bytes_read = f.read(SIZE)
+            if not bytes_read:
+                print("salio al break")
+            # file transmitting is done
+                break
+        # we use sendall to assure transimission in 
+        # busy networks
+            conn.send(bytes_read)
+        # update the progress bar
+            progress.update(len(bytes_read))
+
     """ Closing the file. """
     file.close()
         
@@ -55,6 +77,9 @@ while True:
  
     if (ThreadCount>5):
         break
+
+
+
     print('Thread Number: ' + str(ThreadCount))
     ThreadCount += 1
 server.close()
