@@ -29,9 +29,9 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
 
     archivo="cliente" + str(cliente) + ".txt"        
     """ Opening and reading the file data. """ 
-    filename=direccion+archivo #CAMBIAR POR UN INPUT
+    filename=archivo #CAMBIAR POR UN INPUT
 
-    file = open(filename, "r")
+    file = open((direccion+filename), "r")
     data = file.read()
 
     
@@ -39,9 +39,15 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
     conn.send(filename.encode(FORMAT))
     msg = conn.recv(SIZE).decode(FORMAT)
 
+
+
     print(f"[SERVER]: {msg}")
+    """ Sending the hash to the client. """
     hashing=hash.hash_file(filename)
     conn.send(hashing.encode(FORMAT))
+    """ Sending the filesize to the server. """
+    print(filesize)
+    conn.send(filesize.encode(FORMAT))
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "rb") as f:
         while True:
@@ -56,10 +62,8 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
             conn.send(bytes_read)
         # update the progress bar
             progress.update(len(bytes_read))
-    """ Sending the hash to the client. """
     
-    print("Hash envido")
-    print(hashing)
+
     
 
     """ Closing the file. """
@@ -73,7 +77,7 @@ elif(num==2):
     num=5
 elif (num==3):
     num=10 
-direccion=input("Escriba el tamaño del archivo que mandara: \n 1)100MB  \n 2)250MB \n")
+direccion=int(input("Escriba el tamaño del archivo que mandara: \n 1)100MB  \n 2)250MB \n"))
 tamano=0
 if(direccion==1):
     direccion="archivos/100/"

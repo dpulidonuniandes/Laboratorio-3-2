@@ -37,11 +37,14 @@ def multiples():
     file = open(filename, "w")
     client.send("Filename received.".encode(FORMAT))
     
-    """ Receiving the file data from the server. """
-    filesize = tamano  
+
+    """ Receiving the hash from the server. """
     hashing=client.recv(SIZE).decode(FORMAT)
     print("Hash enviado \n")
     print(hashing)
+    """ Receiving the filesize from the server. """
+    
+    filesize = int(client.recv(SIZE).decode(FORMAT)  )
     progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "wb") as f:
         while os.path.getsize(filename)!=filesize:
