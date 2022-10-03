@@ -7,11 +7,11 @@ import os
 import hash
 
 def multiples():
-    IP = '127.0.0.1'
+    IP = '192.168.1.106'
     PORT = 4455
     ADDR = (IP, PORT)
     FORMAT = "utf-8"
-    SIZE = 4096
+    SIZE = 5242880*10
     
     """
     tamano = int(input("defina con cuantos megabytes quiere trabajar (100 o 250): "))
@@ -44,12 +44,21 @@ def multiples():
     print(hashing)
     """ Receiving the filesize from the server. """
     
-    filesize = int(client.recv(SIZE).decode(FORMAT) )
+    size = client.recv(SIZE).decode(FORMAT)
+    size = size[0:9]
+    filesize=0
+    if("104857600"==size):
+        filesize=104857600
+    elif("262144000"==size):
+        filesize=262144000
     progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+    sentinela=True
+    file_stats= os.stat(filename)
     with open(filename, "wb") as f:
-        while os.path.getsize(filename)!=filesize:
+        while (file_stats.st_size!=filesize) :
             # read 1024 bytes from the socket (receive)
             bytes_read = client.recv(SIZE)
+            
             if not bytes_read:    
                 # nothing is received
                 # file transmitting is done
@@ -58,12 +67,14 @@ def multiples():
             f.write(bytes_read)
             # update the progress bar
             progress.update(len(bytes_read))
-    """ Receiving the hash from the server. """    
-    
+    """ Receiving the hash from the server. """   
+    print("PRRRRRRRRRROSGRAS")
+    print(len(progress))
 
     hashcalculado=hash.hash_file(filename)
     print("Hash calculado \n")
     print(hashcalculado)
+    print("Hash")
     if (hashing==hashcalculado):
         print("El hash enviado y el hash calculado son los mismos")
     else:
