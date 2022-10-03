@@ -43,13 +43,15 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
 
     print(f"[SERVER]: {msg}")
     """ Sending the hash to the client. """
-    hashing=hash.hash_file(filename)
+    hashing=hash.hash_file(direccion+filename)
     conn.send(hashing.encode(FORMAT))
     """ Sending the filesize to the server. """
+    print("---------------------------------------------------------//////////////////////")
     print(filesize)
-    conn.send(filesize.encode(FORMAT))
+    strfilesize=str(filesize)
+    conn.send(strfilesize.encode(FORMAT))
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-    with open(filename, "rb") as f:
+    with open((direccion+filename), "rb") as f:
         while True:
             # read the bytes from the file
             bytes_read = f.read(SIZE)

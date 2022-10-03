@@ -44,7 +44,7 @@ def multiples():
     print(hashing)
     """ Receiving the filesize from the server. """
     
-    filesize = int(client.recv(SIZE).decode(FORMAT)  )
+    filesize = int(client.recv(SIZE).decode(FORMAT) )
     progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "wb") as f:
         while os.path.getsize(filename)!=filesize:
