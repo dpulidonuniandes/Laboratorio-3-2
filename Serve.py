@@ -1,3 +1,4 @@
+import datetime
 import socket
 import os
 from _thread import *
@@ -51,6 +52,12 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
     conn.send(strfilesize.encode(FORMAT))
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     sentinela=True
+    """
+    ct = datetime.datetime.now()
+    ct=str(ct)
+
+    f = open(""+ct+"-log.txt", "w")
+    """
     with open((direccion+filename), "rb") as f:
         while sentinela:
             # read the bytes from the file
