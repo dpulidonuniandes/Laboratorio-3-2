@@ -16,18 +16,19 @@ def multiples():
     """
     tamano = int(input("defina con cuantos megabytes quiere trabajar (100 o 250): "))
     tamano = tamano*1000000
-    """
+    
     
     tamano=104857600
-    peso="" + str(tamano) + ""
     
+    peso="" + str(tamano) + ""
+    """
     
     """ Staring a TCP socket. """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     """ Connecting to the server. """
     client.connect(ADDR)
-    client.send(peso.encode(FORMAT))
+    
     
     """ Receiving the filename from the server. """
     filename = client.recv(SIZE).decode(FORMAT)
@@ -77,12 +78,21 @@ def multiples():
     """client.close()
     print(f"[DISCONNECTED]disconnected.") """
     return
+    
 
-NUM_HILOS = 5
+clientes=int(input("Escriba el numero de clientes que desea conectar: \n 1)1  \n 2)5 \n 3)10 \n"))
+if(clientes==1):
+    clientes=1
+elif(clientes==2):
+    clientes=5
+elif (clientes==3):
+    clientes=10
+    
+    
+NUM_HILOS = clientes
 
 for num_hilo in range(NUM_HILOS):
     try:
-        
         start_new_thread(multiples,())  
     except socket.error as e:
         print(str(e))
