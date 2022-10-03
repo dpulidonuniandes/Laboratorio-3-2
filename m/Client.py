@@ -4,10 +4,10 @@ from _thread import *
 import struct
 import tqdm
 import os
-
+import hash
 
 def multiples():
-    IP = '192.168.1.109'
+    IP = '127.0.0.1'
     PORT = 4455
     ADDR = (IP, PORT)
     FORMAT = "utf-8"
@@ -38,10 +38,12 @@ def multiples():
     
     """ Receiving the file data from the server. """
     filesize = tamano  
-        
+    hashing=client.recv(SIZE).decode(FORMAT)
+    print("Hash enviado \n")
+    print(hashing)
     progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "wb") as f:
-        while os.path.getsize(filename)<=filesize:
+        while os.path.getsize(filename)!=filesize:
             # read 1024 bytes from the socket (receive)
             bytes_read = client.recv(SIZE)
             if not bytes_read:    
@@ -52,29 +54,17 @@ def multiples():
             f.write(bytes_read)
             # update the progress bar
             progress.update(len(bytes_read))
-        
-        
-    """ 
-    fmt = "<Q"
-    expected_bytes = struct.calcsize(fmt)
-    received_bytes = 0
-    stream = bytes()
+    """ Receiving the hash from the server. """    
     
-    while received_bytes < tamano:
-        data = client.recv(expected_bytes - received_bytes)
-        data = data.decode(FORMAT)
-        stream += data
-        received_bytes += len(data)
+
+    hashcalculado=hash.hash_file(filename)
+    print("Hash calculado \n")
+    print(hashcalculado)
+    if (hashing==hashcalculado):
+        print("El hash enviado y el hash calculado son los mismos")
+    else:
+         print("Los hash son distintos")
         
-        
-        
-    while received_bytes < expected_bytes:
-        chunk = sck.recv(expected_bytes - received_bytes)
-        stream += chunk
-        received_bytes += len(chunk)
-    filesize = struct.unpack(fmt, stream)[0]
-    return filesize
-    """
     
     
     print(" Receiving the file data.")

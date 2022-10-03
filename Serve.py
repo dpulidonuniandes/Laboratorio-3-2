@@ -2,8 +2,8 @@ import socket
 import os
 from _thread import *
 import tqdm
-
-IP = '192.168.1.109'
+import hash
+IP = '127.0.0.1'
 PORT = 4455
 ADDR = (IP, PORT)
 ThreadCount = 1
@@ -30,6 +30,8 @@ def multi_threaded_client(conn,cliente):
     archivo="cliente" + str(cliente) + ".txt"        
     """ Opening and reading the file data. """ 
     filename= archivo #CAMBIAR POR UN INPUT
+    print("Archivooooooo")
+    print(arvhivo)
     file = open(filename, "r")
     data = file.read()
     """ Reciving the sizefile to the server. """
@@ -40,14 +42,11 @@ def multi_threaded_client(conn,cliente):
     msg = conn.recv(SIZE).decode(FORMAT)
 
     print(f"[SERVER]: {msg}")
-    """ Sending the file data to the server. """
-    """ conn.send(data.encode(FORMAT))
-    msg = conn.recv(SIZE).decode(FORMAT)
-    print(f"[SERVER]: {msg}")""" 
+    hashing=hash.hash_file(filename)
+    conn.send(hashing.encode(FORMAT))
     filesize = 104857600 #CAmbiar despues
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "rb") as f:
-        print()
         while True:
             # read the bytes from the file
             bytes_read = f.read(SIZE)
@@ -60,6 +59,11 @@ def multi_threaded_client(conn,cliente):
             conn.send(bytes_read)
         # update the progress bar
             progress.update(len(bytes_read))
+    """ Sending the hash to the client. """
+    
+    print("Hash envido")
+    print(hashing)
+    
 
     """ Closing the file. """
     file.close()
