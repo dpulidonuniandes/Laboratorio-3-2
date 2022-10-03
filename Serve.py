@@ -3,11 +3,11 @@ import os
 from _thread import *
 import tqdm
 import hash
-IP = '127.0.0.1'
+IP = '192.168.1.106'
 PORT = 4455
 ADDR = (IP, PORT)
 ThreadCount = 1
-SIZE = 4096
+SIZE = 5242880*10
 FORMAT = "utf-8"
 try:
     print("[STARTING] Server is starting.")
@@ -47,18 +47,17 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
     conn.send(hashing.encode(FORMAT))
     """ Sending the filesize to the server. """
     print("---------------------------------------------------------//////////////////////")
-    print(filesize)
     strfilesize=str(filesize)
     conn.send(strfilesize.encode(FORMAT))
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+    sentinela=True
     with open((direccion+filename), "rb") as f:
-        while True:
+        while sentinela:
             # read the bytes from the file
             bytes_read = f.read(SIZE)
             if not bytes_read:
-                print("salio al break")
             # file transmitting is done
-                break
+                sentinela=False
         # we use sendall to assure transimission in 
         # busy networks
             conn.send(bytes_read)
