@@ -4,11 +4,12 @@ import os
 from _thread import *
 import tqdm
 import hash
+import time
 IP = '192.168.1.106'
 PORT = 4455
 ADDR = (IP, PORT)
 ThreadCount = 1
-SIZE = 5242880*10
+SIZE = 52428800
 FORMAT = "utf-8"
 try:
     print("[STARTING] Server is starting.")
@@ -22,7 +23,7 @@ except socket.error as e:
     
 """ Server is listening, i.e., server is now waiting for the client to connected. """
 
-def multi_threaded_client(conn,cliente,direccion,filesize):
+def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
     print("[LISTENING] Server is listening.")
     """ Server has accepted the connection from the client. """
 
@@ -30,10 +31,10 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
 
     archivo="cliente" + str(cliente) + ".txt"        
     """ Opening and reading the file data. """ 
-    filename=archivo #CAMBIAR POR UN INPUT
+    filename=archivo 
 
     file = open((direccion+filename), "r")
-    data = file.read()
+    
 
     
     """ Sending the filename to the server. """
@@ -52,14 +53,18 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
     conn.send(strfilesize.encode(FORMAT))
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     sentinela=True
-    """
-    ct = datetime.datetime.now()
-    ct=str(ct)
+    
+    fileLog.write("Archivo enviado: Cliente"+str(cliente)+"-Prueba-"+str(num)+".txt")
+    fileLog.write("\n")
+    fileLog.write("Tamano: "+str(filesize/1048576)+"MB")
+    fileLog.write("\n")
+    
+    ts1=time.time()
 
-    f = open(""+ct+"-log.txt", "w")
-    """
     with open((direccion+filename), "rb") as f:
         while sentinela:
+            
+
             # read the bytes from the file
             bytes_read = f.read(SIZE)
             if not bytes_read:
@@ -70,13 +75,19 @@ def multi_threaded_client(conn,cliente,direccion,filesize):
             conn.send(bytes_read)
         # update the progress bar
             progress.update(len(bytes_read))
-    
 
-    
+    fileLog.write("Entrega exitosa? "+str(not sentinela))
+    fileLog.write("\n")
+    ts2=time.time()
+    tst=ts2-ts1
+    fileLog.write("Tiempo de transferencia: "+str(tst*1000)+"ms")
+    fileLog.write("\n")
+    fileLog.write("\n")
 
     """ Closing the file. """
     file.close()
-    
+
+
     
 num=int(input("Escriba el numero de clientes que desea conectar: \n 1)1  \n 2)5 \n 3)10 \n"))
 if(num==1):
@@ -94,6 +105,12 @@ elif(direccion==2):
     direccion="archivos/250/"
     tamano=262144000
 lista=[]
+
+ct = datetime.datetime.now()
+ct=str(ct)
+file_name="Logs/"+ct+"-log.txt"
+file_name=file_name.replace(":","-")
+fileLog = open(file_name, "w")
 while True:
     if (ThreadCount<= num):
         Client, address = server.accept()
@@ -102,7 +119,7 @@ while True:
         print('Connected to: ' + address[0] + ':' + str(address[1]))
     if(ThreadCount == num):
         for i in range(0,num):
-            multi_threaded_client(lista[i][0],i+1,direccion,tamano)
+            multi_threaded_client(lista[i][0],i+1,direccion,tamano,num,fileLog)
  
     if (ThreadCount>num):
         break
@@ -111,4 +128,8 @@ while True:
 
     print('Thread Number: ' + str(ThreadCount))
     ThreadCount += 1
+    
+fileLog.close()
 server.close()
+
+    

@@ -1,0 +1,5 @@
+Archivo enviado: Cliente1-Prueba-5.txt
+Tamano: 100.0MB
+Entrega exitosa? True
+Tiempo de transferencia: 28689.536333084106ms
+
