@@ -12,7 +12,7 @@ def multiples(numero):
     PORT = 4455
     ADDR = (IP, PORT)
     FORMAT = "utf-8"
-    SIZE = 5242880*10
+    SIZE = 52428800
         
     """ Staring a TCP socket. """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,6 +50,11 @@ def multiples(numero):
             bytes_read = client.recv(SIZE)
             
             if not bytes_read:    
+                
+                
+                
+                
+                
                 # nothing is received
                 # file transmitting is done
                 break
@@ -58,6 +63,7 @@ def multiples(numero):
             # update the progress bar
             progress.update(len(bytes_read))
     """ Receiving the hash from the server. """   
+    
     
     hashcalculado=hash.hash_file(filename)
     print("Hash calculado \n")
@@ -71,16 +77,20 @@ def multiples(numero):
     
     
     print(" Receiving the file data.")
-    #file.write(data)
-    client.send("File data received".encode(FORMAT))
-    
+
     """Closing the file. """
     file.close()
     """Closing the connection from the client. """
     client.close()
     print(f"[DISCONNECTED]disconnected.")
-    shutil.move(filename, "ArchivosRecibidos/"+filename)
-    shutil.copy(filename, filename+"prueba"+str(numero)+".txt")
+    nuevo="-prueba-"+str(numero)+".txt"
+    cambio=filename.replace(".txt",nuevo)
+    
+    os.rename(filename, cambio)
+    os.replace(cambio,"ArchivosRecibidos/"+cambio)
+    
+
+    
     return
     
 
