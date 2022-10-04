@@ -64,7 +64,7 @@ def multiples(numero):
             progress.update(len(bytes_read))
     """ Receiving the hash from the server. """   
     
-    
+ 
     hashcalculado=hash.hash_file(filename)
     print("Hash calculado \n")
     print(hashcalculado)
@@ -79,13 +79,13 @@ def multiples(numero):
     print(" Receiving the file data.")
 
     """Closing the file. """
-    file.close()
+    
     """Closing the connection from the client. """
     client.close()
     print(f"[DISCONNECTED]disconnected.")
     nuevo="-prueba-"+str(numero)+".txt"
     cambio=filename.replace(".txt",nuevo)
-    
+    file.close()
     os.rename(filename, cambio)
     os.replace(cambio,"ArchivosRecibidos/"+cambio)
     
