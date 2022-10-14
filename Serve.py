@@ -14,7 +14,7 @@ FORMAT = "utf-8"
 try:
     print("[STARTING] Server is starting.")
     """ Staring a TCP socket. """
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     """ Bind the IP and PORT to the server. """
     server.bind(ADDR)
     server.listen(25)

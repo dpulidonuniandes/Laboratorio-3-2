@@ -15,7 +15,7 @@ def multiples(numero):
     SIZE = 52428800
         
     """ Staring a TCP socket. """
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     """ Connecting to the server. """
     client.connect(ADDR)
