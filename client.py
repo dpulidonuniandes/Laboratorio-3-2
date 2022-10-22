@@ -8,7 +8,7 @@ import hash
 import shutil
 
 def multiples(cl,numero):
-    IP = '192.168.1.109'
+    IP = '192.168.110.131'
     PORT = 12000
     ADDR = (IP, PORT)
     FORMAT = "utf-8"
@@ -17,10 +17,11 @@ def multiples(cl,numero):
     """ Staring a UDP socket. """
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     message = str(numero)
-    """ Connecting to the server. """
     
+    """ Connecting to the server. """
     client.sendto(message.encode(),ADDR)
     modifiedMessage, serverAddress = client.recvfrom(SIZE)
+    
     """ Receiving the filename from the server. """
     filename,serverAddress = client.recvfrom(SIZE)
     filename=filename.decode()
@@ -87,7 +88,7 @@ def multiples(cl,numero):
 
     shutil.move(filename,"ArchivosRecibidos/"+filename)
    
-    
+    os.remove(filename)
 
     
     return
