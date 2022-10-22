@@ -1,4 +1,5 @@
 import datetime
+from email import message
 import socket
 import os
 from _thread import *
@@ -9,7 +10,7 @@ IP = '192.168.1.109'
 PORT = 12000
 ADDR = (IP, PORT)
 ThreadCount = 1
-SIZE = 2048
+SIZE = 4096
 FORMAT = "utf-8"
 try:
     print("[STARTING] Server is starting.")
@@ -22,22 +23,24 @@ except socket.error as e:
     
 """ Server is listening, i.e., server is now waiting for the client to connected. """
 
-def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
+def multi_threaded_client(conn,direccion,filesize,num,fileLog,lista):
+
     print("[LISTENING] Server is listening.")
     """ Server has accepted the connection from the client. """
 
-    print(f"[NEW CLIENT] {cliente} connected.")
+    for i in range(0,len(lista)):
+        print(f"[NEW CLIENT] {str(i+1)} connected.")
 
-    archivo="cliente" + str(cliente) + ".txt"        
+    archivo="cliente.txt" 
     """ Opening and reading the file data. """ 
     filename=archivo 
 
     file = open((direccion+filename), "r")
-    
 
     
     """ Sending the filename to the server. """
-    server.sendto(filename.encode(FORMAT),conn)
+    for i in range(0,len(lista)):
+        server.sendto(filename.encode(FORMAT),lista[i][1])
     msg, conn = server.recvfrom(SIZE)
     msg = msg.decode()
 
@@ -45,25 +48,26 @@ def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
     print(f"[SERVER]: {msg}")
     """ Sending the hash to the client. """
     hashing=hash.hash_file(direccion+filename)
-    server.sendto(hashing.encode(FORMAT),conn)
+    for i in range(0,len(lista)):
+        server.sendto(hashing.encode(FORMAT),lista[i][1])
     """ Sending the filesize to the server. """
     print("---------------------------------------------------------//////////////////////")
     strfilesize=str(filesize)
-    server.sendto(strfilesize.encode(FORMAT),conn)
+    for i in range(0,len(lista)):
+        server.sendto(strfilesize.encode(FORMAT),lista[i][1])
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     sentinela=True
     
-    fileLog.write("Archivo enviado: Cliente"+str(cliente)+"-Prueba-"+str(num)+".txt")
-    fileLog.write("\n")
-    fileLog.write("Tamano: "+str(filesize/1048576)+"MB")
-    fileLog.write("\n")
-    
+    for i in range(0,len(lista)):
+        fileLog.write("Archivo enviado: Cliente"+str(i)+"-Prueba-"+str(num)+".txt")
+        fileLog.write("\n")
+        fileLog.write("Tamano: "+str(filesize/1048576)+"MB")
+        fileLog.write("\n")
     ts1=time.time()
 
     with open((direccion+filename), "rb") as f:
+        print(direccion+filename)
         while sentinela:
-            
-
             # read the bytes from the file
             bytes_read = f.read(SIZE)
             if not bytes_read:
@@ -71,7 +75,8 @@ def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
                 sentinela=False
         # we use sendall to assure transimission in 
         # busy networks
-            server.sendto(bytes_read,conn)
+            for i in range(0,len(lista)):
+                server.sendto(bytes_read,lista[i][1])  
         # update the progress bar
             progress.update(len(bytes_read))
 
@@ -119,18 +124,13 @@ while True:
         lista.append(cliente)
         print('Connected to: ' + address[0] + ':' + str(address[1]))
     if(ThreadCount == num):
-        for i in range(0,num):
-            multi_threaded_client(address,i+1,direccion,tamano,num,fileLog)
- 
-    if (ThreadCount>num):
         break
-
-
 
     print('Thread Number: ' + str(ThreadCount))
     ThreadCount += 1
     
+multi_threaded_client(address,direccion,tamano,num,fileLog,lista)
+
 fileLog.close()
 server.close()
-
-    
+     
