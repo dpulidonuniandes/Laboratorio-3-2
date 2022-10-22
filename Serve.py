@@ -6,7 +6,7 @@ from _thread import *
 import tqdm
 import hash
 import time
-IP = '192.168.1.109'
+IP = '192.168.110.131'
 PORT = 12000
 ADDR = (IP, PORT)
 ThreadCount = 1
@@ -59,7 +59,7 @@ def multi_threaded_client(conn,direccion,filesize,num,fileLog,lista):
     sentinela=True
     
     for i in range(0,len(lista)):
-        fileLog.write("Archivo enviado: Cliente"+str(i)+"-Prueba-"+str(num)+".txt")
+        fileLog.write("Archivo enviado: Cliente"+str(i+1)+"-Prueba-"+str(num)+".txt")
         fileLog.write("\n")
         fileLog.write("Tamano: "+str(filesize/1048576)+"MB")
         fileLog.write("\n")
