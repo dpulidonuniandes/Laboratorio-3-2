@@ -20,9 +20,7 @@ def multiples(cl,numero):
     """ Connecting to the server. """
     
     client.sendto(message.encode(),ADDR)
-    print('envio el mensaje')
     modifiedMessage, serverAddress = client.recvfrom(SIZE)
-    print(" se ha hecho la conexio n con "+str(modifiedMessage))
     """ Receiving the filename from the server. """
     filename,serverAddress = client.recvfrom(SIZE)
     filename=filename.decode()
@@ -82,21 +80,13 @@ def multiples(cl,numero):
     print(" Receiving the file data.")
 
     """Closing the file. """
-    
+    f.close()
     """Closing the connection from the client. """
     client.close()
     print(f"[DISCONNECTED]disconnected.")
-    #nuevo="-prueba-"+str(numero)+".txt"
-    print("fin1")
-    #cambio=filename.replace(".txt",nuevo)
-    print("fin2")
-    file.close()
 
-    print("fin3")
-    #os.rename(filename, cambio)
-    print("fin4")
-    os.replace(filename,"ArchivosRecibidos/"+filename)
-    print("fin5")
+    shutil.move(filename,"ArchivosRecibidos/"+filename)
+   
     
 
     
