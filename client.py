@@ -7,16 +7,16 @@ import os
 import hash
 import shutil
 
-def multiples(numero):
+def multiples(cl,numero):
     IP = '192.168.1.109'
     PORT = 12000
     ADDR = (IP, PORT)
     FORMAT = "utf-8"
-    SIZE = 52428800
+    SIZE = 4096
         
     """ Staring a UDP socket. """
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    message = 'conectar'
+    message = str(numero)
     """ Connecting to the server. """
     
     client.sendto(message.encode(),ADDR)
@@ -26,6 +26,8 @@ def multiples(numero):
     """ Receiving the filename from the server. """
     filename,serverAddress = client.recvfrom(SIZE)
     filename=filename.decode()
+    nuevo=str(cl)+"-prueba-"+str(numero)+".txt"
+    filename=filename.replace(".txt",nuevo)
     print("[RECV] Receiving the filename.")
     file = open(filename, "w")
     client.sendto("Filename received.".encode(FORMAT),ADDR)
@@ -58,8 +60,6 @@ def multiples(numero):
                 
                 
                 
-                
-                
                 # nothing is received
                 # file transmitting is done
                 break
@@ -79,8 +79,6 @@ def multiples(numero):
     else:
          print("Los hash son distintos")
         
-    
-    
     print(" Receiving the file data.")
 
     """Closing the file. """
@@ -88,11 +86,17 @@ def multiples(numero):
     """Closing the connection from the client. """
     client.close()
     print(f"[DISCONNECTED]disconnected.")
-    nuevo="-prueba-"+str(numero)+".txt"
-    cambio=filename.replace(".txt",nuevo)
+    #nuevo="-prueba-"+str(numero)+".txt"
+    print("fin1")
+    #cambio=filename.replace(".txt",nuevo)
+    print("fin2")
     file.close()
-    os.rename(filename, cambio)
-    os.replace(cambio,"ArchivosRecibidos/"+cambio)
+
+    print("fin3")
+    #os.rename(filename, cambio)
+    print("fin4")
+    os.replace(filename,"ArchivosRecibidos/"+filename)
+    print("fin5")
     
 
     
@@ -109,10 +113,11 @@ elif (clientes==3):
     
     
 NUM_HILOS = clientes
-
+numero=1
 for num_hilo in range(NUM_HILOS):
     try:
-        start_new_thread(multiples,(NUM_HILOS,))  
+        start_new_thread(multiples,(numero,NUM_HILOS,))
+        numero+=1
     except socket.error as e:
         print(str(e))
      
