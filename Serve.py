@@ -66,7 +66,6 @@ def multi_threaded_client(conn,direccion,filesize,num,fileLog,lista):
     ts1=time.time()
 
     with open((direccion+filename), "rb") as f:
-        print(direccion+filename)
         while sentinela:
             # read the bytes from the file
             bytes_read = f.read(SIZE)
