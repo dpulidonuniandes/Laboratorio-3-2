@@ -1,0 +1,3 @@
+fsutil file createnew cliente1.txt 104857600
+
+sudo fallocate -l 100M cliente1.txt

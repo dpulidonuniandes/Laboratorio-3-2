@@ -5,19 +5,18 @@ from _thread import *
 import tqdm
 import hash
 import time
-IP = '192.168.1.106'
-PORT = 4455
+IP = '192.168.1.109'
+PORT = 12000
 ADDR = (IP, PORT)
 ThreadCount = 1
-SIZE = 52428800
+SIZE = 2048
 FORMAT = "utf-8"
 try:
     print("[STARTING] Server is starting.")
-    """ Staring a TCP socket. """
+    """ Staring a UDP socket. """
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     """ Bind the IP and PORT to the server. """
     server.bind(ADDR)
-    server.listen(25)
 except socket.error as e:
     print(str(e))    
     
@@ -38,19 +37,19 @@ def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
 
     
     """ Sending the filename to the server. """
-    conn.send(filename.encode(FORMAT))
-    msg = conn.recv(SIZE).decode(FORMAT)
-
+    server.sendto(filename.encode(FORMAT),conn)
+    msg, conn = server.recvfrom(SIZE)
+    msg = msg.decode()
 
 
     print(f"[SERVER]: {msg}")
     """ Sending the hash to the client. """
     hashing=hash.hash_file(direccion+filename)
-    conn.send(hashing.encode(FORMAT))
+    server.sendto(hashing.encode(FORMAT),conn)
     """ Sending the filesize to the server. """
     print("---------------------------------------------------------//////////////////////")
     strfilesize=str(filesize)
-    conn.send(strfilesize.encode(FORMAT))
+    server.sendto(strfilesize.encode(FORMAT),conn)
     progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
     sentinela=True
     
@@ -72,7 +71,7 @@ def multi_threaded_client(conn,cliente,direccion,filesize,num,fileLog):
                 sentinela=False
         # we use sendall to assure transimission in 
         # busy networks
-            conn.send(bytes_read)
+            server.sendto(bytes_read,conn)
         # update the progress bar
             progress.update(len(bytes_read))
 
@@ -113,13 +112,15 @@ file_name=file_name.replace(":","-")
 fileLog = open(file_name, "w")
 while True:
     if (ThreadCount<= num):
-        Client, address = server.accept()
+        Client, address = server.recvfrom(4096)
+        server.sendto(Client, address)
+        print(Client.decode())
         cliente=[Client, address]
         lista.append(cliente)
         print('Connected to: ' + address[0] + ':' + str(address[1]))
     if(ThreadCount == num):
         for i in range(0,num):
-            multi_threaded_client(lista[i][0],i+1,direccion,tamano,num,fileLog)
+            multi_threaded_client(address,i+1,direccion,tamano,num,fileLog)
  
     if (ThreadCount>num):
         break
