@@ -81,14 +81,12 @@ def multiples(cl,numero):
     print(" Receiving the file data.")
 
     """Closing the file. """
-    f.close()
+    file.close()
     """Closing the connection from the client. """
     client.close()
     print(f"[DISCONNECTED]disconnected.")
 
     shutil.move(filename,"ArchivosRecibidos/"+filename)
-   
-    os.remove(filename)
 
     
     return
